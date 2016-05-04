@@ -127,7 +127,7 @@ module Debian
             `ar p #{deb} control.tar.gz | tar zx -C tmp/#{tdeb}/`
 
             package_info = [
-                "Filename: #{npath}#{s3_compatible_encode(tdeb)}",
+                "Filename: #{npath}#{tdeb}",
                 "MD5sum: #{sums['md5']}",
                 "SHA1: #{sums['sha1']}",
                 "SHA256: #{sums['sha256']}",
@@ -215,10 +215,6 @@ module Debian
             end
             system sign_cmd
         end
-    end
-
-    def s3_compatible_encode(str)
-        str.gsub(/[#\$&'\(\)\*\+,\/:;=\?@\[\]]/) { |x| x.each_byte.map { |b| '%' + b.to_s(16) }.join }
     end
 end
 
