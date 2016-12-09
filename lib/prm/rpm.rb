@@ -232,7 +232,7 @@ module Redhat
         if !rpm.provides.empty?
             provide_primary_data << "<rpm:provides>\n"
             rpm.provides.each do |prov|
-                name = prov[1]
+                name = prov[0]
                 prov[1].nil? ? flag = "" : flag = prov[1]
                 flag = "EQ" if flag = "="
                 prov[2].nil? ? version = "" && release = "" : (version,release = prov[2].split(/-/))
