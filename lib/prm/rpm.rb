@@ -138,7 +138,7 @@ module Redhat
             arch.each { |a|
                 puts a
                 Dir.glob(directory + "/*.rpm") do |file|
-                    if file =~ /^.*#{a}.*\.rpm$/i || file =~ /^.*all.*\.rpm$/i || file =~ /^.*any.*\.rpm$/i
+                    if file =~ /^.*#{a}.*\.rpm$/i || file =~ /^.*noarch.*\.rpm$/i || file =~ /^.*any.*\.rpm$/i
                         target_dir = "#{path}/#{r}/#{a}/"
                         FileUtils.mkpath(target_dir)
                         if file =~ /^.*#{r}.*\.rpm$/i
