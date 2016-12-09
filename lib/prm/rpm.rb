@@ -234,6 +234,7 @@ module Redhat
             rpm.provides.each do |prov|
                 name = prov[1]
                 prov[1].nil? ? flag = "" : flag = prov[1]
+                flag = "EQ" if flag = "="
                 prov[2].nil? ? version = "" && release = "" : (version,release = prov[2].split(/-/))
                 provide_primary_data << 
                 "<rpm:entry name=\"#{name}\" flags=\"#{flag}\" epoch=\"0\" ver=\"#{version}\" rel=\"#{release}\"/>\n"
@@ -241,7 +242,7 @@ module Redhat
             provide_primary_data << "</rpm:provides>\n"
         end
 
-        init_primary_data + provide_primary_data
+        init_primary_data = init_primary_data + provide_primary_data
 
         require_primary_data = String.new
         if !rpm.requires.empty?
@@ -251,13 +252,18 @@ module Redhat
                     name = req[0]
                 req[1].nil? ? flag = "" : flag = req[1]
                 req[2].nil? ? version = "" && release = "" : (version,release = req[2].split(/-/))
-                require_primary_data << 
-                "<rpm:entry name=\"#{name}\" flags=\"#{flag}\" epoch=\"0\" ver=\"#{version}\" rel=\"#{release}\"/>\n"
+                if !flag.empty? && !version.empty? && !release.empty?
+                  require_primary_data <<
+                  "<rpm:entry name=\"#{name}\" flags=\"#{flag}\" epoch=\"0\" ver=\"#{version}\" rel=\"#{release}\"/>\n"
+                else
+                  require_primary_data <<
+                  "<rpm:entry name=\"#{name}\"/>\n"
+                end
             end
             require_primary_data << "</rpm:requires>\n"
         end
 
-        init_primary_data + require_primary_data
+        init_primary_data = init_primary_data + require_primary_data
 
         conflict_primary_data = String.new
         if !rpm.conflicts.empty?
