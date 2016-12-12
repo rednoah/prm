@@ -249,10 +249,10 @@ module Redhat
             require_primary_data << "<rpm:requires>\n"
             rpm.requires.each do |req|
                 next if req[0] =~ /^rpmlib/
-                    name = req[0]
+                name = req[0]
                 req[1].nil? ? flag = "" : flag = req[1]
                 req[2].nil? ? version = "" && release = "" : (version,release = req[2].split(/-/))
-                if !flag.empty? && !version.empty? && !release.empty?
+                if !flag.empty?
                   require_primary_data <<
                   "<rpm:entry name=\"#{name}\" flags=\"#{flag}\" epoch=\"0\" ver=\"#{version}\" rel=\"#{release}\"/>\n"
                 else
