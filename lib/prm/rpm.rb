@@ -236,8 +236,13 @@ module Redhat
                 prov[1].nil? ? flag = "" : flag = prov[1]
                 flag = "EQ" if flag == "="
                 prov[2].nil? ? version = "" && release = "" : (version,release = prov[2].split(/-/))
-                provide_primary_data << 
-                "<rpm:entry name=\"#{name}\" flags=\"#{flag}\" epoch=\"0\" ver=\"#{version}\" rel=\"#{release}\"/>\n"
+                if !flag.empty?
+                    provide_primary_data << 
+                    "<rpm:entry name=\"#{name}\" flags=\"#{flag}\" epoch=\"0\" ver=\"#{version}\" rel=\"#{release}\"/>\n"
+                else
+                    provide_primary_data << 
+                    "<rpm:entry name=\"#{name}\"/>\n"
+                end
             end
             provide_primary_data << "</rpm:provides>\n"
         end
