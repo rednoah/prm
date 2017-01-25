@@ -186,9 +186,10 @@ module Redhat
 
     def create_filelists_xml(file, time, sha256sum, rpm, filesize, pkgmeta, start_header, end_header, pkgnum)
         init_filelists_data = String.new
-        init_filelists_data <<
+        epoch = (pkgmeta[:epoch]) ? pkgmeta[:epoch].first : 0
+        init_filelists_data <<    
         %Q(<package pkgid="#{sha256sum}" name="#{pkgmeta[:name]}" arch="#{pkgmeta[:arch]}">
-        <version epoch="0" ver="#{pkgmeta[:version]}" rel="#{pkgmeta[:release]}"/>\n\n)
+        <version epoch="#{epoch}" ver="#{pkgmeta[:version]}" rel="#{pkgmeta[:release]}"/>\n\n)
 
         rpm.files.each do |file|
             init_filelists_data << %Q(        <file>#{file}</file>\n)
@@ -203,7 +204,7 @@ module Redhat
         init_other_data = String.new
         init_other_data << 
         %Q(<package pkgid="#{sha256sum}" name="#{pkgmeta[:name]}" arch="#{pkgmeta[:arch]}">
-           <version epoch="0" ver="#{pkgmeta[:version]}" rel="#{pkgmeta[:release]}"/>\n)
+           <version epoch="#{pkgmeta[:epoch] || 0}" ver="#{pkgmeta[:version]}" rel="#{pkgmeta[:release]}"/>\n)
            init_other_data <<
            %Q(</package>)
 
@@ -213,12 +214,12 @@ module Redhat
     def create_primary_xml(file, time, sha256sum, rpm, filesize, pkgmeta, start_header, end_header, pkgnum)
         time = time.to_i
         cut_file = File.basename(file)
-
+        epoch = (pkgmeta[:epoch]) ? pkgmeta[:epoch].first : 0
         init_primary_data = String.new
         init_primary_data = %Q(<package type=\"rpm\">
         <name>#{pkgmeta[:name]}</name>
         <arch>#{pkgmeta[:arch]}</arch>
-        <version epoch=\"0\" ver=\"#{pkgmeta[:version]}\" rel=\"#{pkgmeta[:release]}\"/>
+        <version epoch=\"#{epoch}\" ver=\"#{pkgmeta[:version]}\" rel=\"#{pkgmeta[:release]}\"/>
         <checksum type=\"sha256\" pkgid=\"YES\">#{sha256sum}</checksum>
         <summary>#{pkgmeta[:summary]}</summary>
         <description>#{pkgmeta[:description]}</description>
@@ -242,10 +243,21 @@ module Redhat
                 name = prov[0]
                 prov[1].nil? ? flag = "" : flag = prov[1]
                 flag = "EQ" if flag == "="
-                prov[2].nil? ? version = "" && release = "" : (version,release = prov[2].split(/-/))
+                if prov[2].nil?
+                    epoch = 0 && version = "" && release = ""
+                else
+                    if prov[2].include?(":")
+                        prov_arr = prov[2].split(":")
+                        epoch = prov_arr[0]
+                        version,release = prov_arr[1].split(/-/)
+                    else
+                        epoch = 0
+                        version,release = prov[2].split(/-/)
+                    end
+                end
                 if !flag.empty?
                     provide_primary_data << 
-                    "<rpm:entry name=\"#{name}\" flags=\"#{flag}\" epoch=\"0\" ver=\"#{version}\" rel=\"#{release}\"/>\n"
+                    "<rpm:entry name=\"#{name}\" flags=\"#{flag}\" epoch=\"#{epoch}\" ver=\"#{version}\" rel=\"#{release}\"/>\n"
                 else
                     provide_primary_data << 
                     "<rpm:entry name=\"#{name}\"/>\n"
@@ -263,10 +275,21 @@ module Redhat
                 next if req[0] =~ /^rpmlib/
                 name = req[0]
                 req[1].nil? ? flag = "" : flag = req[1]
-                req[2].nil? ? version = "" && release = "" : (version,release = req[2].split(/-/))
+                if req[2].nil?
+                    epoch = 0 && version = "" && release = ""
+                else
+                    if req[2].include?(":")
+                        req_arr = req[2].split(":")
+                        epoch = req_arr[0]
+                        version,release = req_arr[1].split(/-/)
+                    else
+                        epoch = 0
+                        version,release = req[2].split(/-/)
+                    end
+                end
                 if !flag.empty?
                   require_primary_data <<
-                  "<rpm:entry name=\"#{name}\" flags=\"#{flag}\" epoch=\"0\" ver=\"#{version}\" rel=\"#{release}\"/>\n"
+                  "<rpm:entry name=\"#{name}\" flags=\"#{flag}\" epoch=\"#{epoch}\" ver=\"#{version}\" rel=\"#{release}\"/>\n"
                 else
                   require_primary_data <<
                   "<rpm:entry name=\"#{name}\"/>\n"
