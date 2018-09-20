@@ -124,8 +124,8 @@ module Debian
                     end
                 end
             end
-            `ar p #{deb} control.tar.gz | tar zx -C tmp/#{tdeb}/`
-            `ar p #{deb} control.tar.xz | tar x -C tmp/#{tdeb}/`
+            `ar -t  #{deb} | grep gz && ar p #{deb} control.tar.gz | tar zx -C tmp/#{tdeb}/`
+            `ar -t #{deb} | grep xz && ar p #{deb} control.tar.xz | tar Jx -C tmp/#{tdeb}/`
 
             package_info = [
                 "Filename: #{npath}#{tdeb}",
