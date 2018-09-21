@@ -202,9 +202,10 @@ module Redhat
 
     def create_other_xml(file, time, sha256sum, rpm, filesize, pkgmeta, start_header, end_header, pkgnum)
         init_other_data = String.new
+        epoch = (pkgmeta[:epoch]) ? pkgmeta[:epoch].first : 0
         init_other_data << 
         %Q(<package pkgid="#{sha256sum}" name="#{pkgmeta[:name]}" arch="#{pkgmeta[:arch]}">
-           <version epoch="#{pkgmeta[:epoch] || 0}" ver="#{pkgmeta[:version]}" rel="#{pkgmeta[:release]}"/>\n)
+           <version epoch="#{epoch}" ver="#{pkgmeta[:version]}" rel="#{pkgmeta[:release]}"/>\n)
            init_other_data <<
            %Q(</package>)
 
