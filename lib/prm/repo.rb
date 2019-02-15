@@ -51,28 +51,12 @@ module Debian
                 arch.each { |a|
                     puts a
                     Dir.glob(directory + "/*.deb") do |file|
-                        if file =~ /^.*#{a}.*\.deb$/i || file =~ /^.*all.*\.deb$/i || file =~ /^.*any.*\.deb$/i
-                            if file =~ /^.*#{r}.*\.deb$/i
-                                # Lets do this here to help mitigate packages like "asdf-123+wheezy.deb"
-                                FileUtils.cp(file, "#{path}/dists/#{r}/#{c}/binary-#{a}/")
-                                FileUtils.rm(file)
-                            else
-                                FileUtils.cp(file, "#{path}/dists/#{r}/#{c}/binary-#{a}/")
-                                files_moved << file
-                            end
-                        end
+                        puts "Include #{file}"
+                        FileUtils.cp(file, "#{path}/dists/#{r}/#{c}/binary-#{a}/")
                     end
                 }
             }
         }
-
-        files_moved.each do |f|
-            if File.exists?(f)
-                FileUtils.rm(f)
-            end
-        end
-        # Regex?
-        #/^.*#{arch}.*\.deb$/i
     end
 
     def generate_packages_gz(fpath,pfpath,path,rfpath,r,c,a,silent)
