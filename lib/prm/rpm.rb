@@ -146,10 +146,7 @@ module Redhat
                 puts a
                 Dir.glob(directory + "/*.rpm") do |file|
                         puts "Include #{file}"
-                        target_dir = "#{path}/#{r}/#{a}/"
-                        FileUtils.mkpath(target_dir)
-                        FileUtils.cp(file, target_dir)
-                        files_moved << file
+                        FileUtils.cp(file, "#{path}/#{r}/#{a}/")
                 end
             }
         }
