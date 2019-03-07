@@ -145,18 +145,11 @@ module Redhat
             arch.each { |a|
                 puts a
                 Dir.glob(directory + "/*.rpm") do |file|
-                    if file =~ /^.*#{a}.*\.rpm$/i || file =~ /^.*noarch.*\.rpm$/i || file =~ /^.*any.*\.rpm$/i
+                        puts "Include #{file}"
                         target_dir = "#{path}/#{r}/#{a}/"
                         FileUtils.mkpath(target_dir)
-                        if file =~ /^.*#{r}.*\.rpm$/i
-                            # Lets do this here to help mitigate packages like "asdf-123+rhel7.rpm"
-                            FileUtils.cp(file, target_dir)
-                            FileUtils.rm(file)
-                        else
-                            FileUtils.cp(file, target_dir)
-                            files_moved << file
-                        end
-                    end
+                        FileUtils.cp(file, target_dir)
+                        files_moved << file
                 end
             }
         }
