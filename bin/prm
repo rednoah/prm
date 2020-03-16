@@ -3,12 +3,9 @@
 require 'rubygems'
 require 'clamp'
 
-begin
-  require 'prm'
-rescue LoadError
-  $: << File.expand_path(File.join(File.dirname(__FILE__), '..', 'lib'))
-  require 'prm'
-end
+$: << File.expand_path(File.join(File.dirname(__FILE__), '..', 'lib'))
+require 'prm'
+
 
 class Main < Clamp::Command
   option ["-v", "--version"], :flag, "Version information"
